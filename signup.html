@@ -10,6 +10,7 @@
   <div class="login-container">
     <h2>Create Account</h2>
 
+    <input type="text" id="username" placeholder="Enter Username">
     <input type="email" id="email" placeholder="Enter Email">
     <input type="password" id="password" placeholder="Enter Password">
 
@@ -21,6 +22,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAWOpNdjR2HeI9KDY97gCd5TYdsf5cTSY8",
@@ -28,25 +30,34 @@
       projectId: "studenthubnvn",
       storageBucket: "studenthubnvn.firebasestorage.app",
       messagingSenderId: "130984907739",
-      appId: "1:130984907739:web:fd348949df1ed949a24dfe",
-      measurementId: "G-MQ2YXXVHR0"
+      appId: "1:130984907739:web:fd348949df1ed949a24dfe"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    window.signup = function () {
+    window.signup = async function () {
+      const username = document.getElementById("username").value;
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          document.getElementById("message").innerText = "Account Created ✅";
-          window.location.href = "login.html";
-        })
-        .catch((error) => {
-          document.getElementById("message").innerText = error.message;
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Save username in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          username: username,
+          email: email
         });
+
+        document.getElementById("message").innerText = "Account Created ✅";
+        window.location.href = "login.html";
+
+      } catch (error) {
+        document.getElementById("message").innerText = error.message;
+      }
     };
   </script>
 
