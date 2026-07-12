@@ -128,110 +128,70 @@ nav a {
 
 <body>
 
-<!-- 🔙 Back -->
-
-<button class="back-btn" onclick="goBack()">←</button>
-
 <header>
-<h1>📚 Notes</h1>
+    <h1>📚 MLRITM Student Notes</h1>
 
-<nav>
-<a href="index.html">🏠 Home</a>
-<a href="ppts.html">📄 PPTs</a>
-<a href="chat.html">💬 Chat</a>
-</nav>
+    <nav>
+        <a href="index.html">🏠 Home</a>
+        <a href="ppts.html">📄 PPTs</a>
+        <a href="chat.html">💬 Chat</a>
+    </nav>
 </header>
 
-<!-- 🔍 Search -->
-
 <div class="search-box">
-<input type="text" id="search" placeholder="🔍 Search Notes...">
-<span>🔍</span>
+    <input
+        type="text"
+        id="search"
+        placeholder="Search Notes..."
+    >
 </div>
 
-<!-- 🔵 Upload -->
+<div class="upload-box">
 
-<div class="upload-box" onclick="fileInput.click()">
-<h2>⬇️ Upload Notes</h2>
+    <input
+        type="text"
+        id="studentName"
+        placeholder="Your Name"
+    >
+
+    <br><br>
+
+    <input
+        type="file"
+        id="fileInput"
+        accept=".pdf,.ppt,.pptx,.doc,.docx"
+    >
+
+    <br><br>
+
+    <button id="uploadBtn">
+        Upload Note
+    </button>
+
 </div>
 
-<input type="file" id="fileInput" hidden>
+<hr>
 
-<!-- 📂 Uploaded Files -->
+<h2 align="center">
+Uploaded Notes
+</h2>
 
-<div id="fileList"></div>
+<div id="fileList">
 
-<!-- Your Original Cards -->
+Loading...
 
-<section class="cards">
-<div class="card"><h3>1-1 Semester</h3></div>
-<div class="card"><h3>1-2 Semester</h3></div>
-<div class="card"><h3>2-1 Semester</h3></div>
-</section>
+</div>
 
-<footer style="text-align:center;margin:20px;">
+<footer>
+
 © 2026 MLRITM Student Hub
+
 </footer>
 
-<script>
-function goBack() {
-    if (document.referrer === "") {
-        window.location.href = "index.html";
-    } else {
-        window.history.back();
-    }
-}
-
-let files = [];
-
-const fileInput = document.getElementById("fileInput");
-const fileList = document.getElementById("fileList");
-const search = document.getElementById("search");
-
-fileInput.addEventListener("change", function () {
-    let file = this.files[0];
-    if (!file) return;
-
-    let url = URL.createObjectURL(file);
-    files.push({ name: file.name, url: url });
-
-    displayFiles();
-});
-
-function displayFiles() {
-    fileList.innerHTML = "";
-    let text = search.value.toLowerCase();
-
-    files.forEach((file, index) => {
-        if (!file.name.toLowerCase().includes(text)) return;
-
-        let div = document.createElement("div");
-        div.className = "file";
-
-        div.innerHTML = `
-        <b>${file.name}</b><br><br>
-
-        <button class="btn preview" onclick="window.open('${file.url}')">👁️ Preview</button>
-
-        <a href="${file.url}" download>
-            <button class="btn download">⬇️ Download</button>
-        </a>
-
-        <button class="btn delete" onclick="deleteFile(${index})">❌ Delete</button>
-        `;
-
-        fileList.appendChild(div);
-    });
-}
-
-function deleteFile(index) {
-    files.splice(index, 1);
-    displayFiles();
-}
-
-search.addEventListener("input", displayFiles);
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
 
 </body>
+
     </html>
                       
