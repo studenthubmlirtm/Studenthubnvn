@@ -1,48 +1,237 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notes - MLRITM Student Hub</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes - MLRITM Student Hub</title>
+
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+}
+
+/* 🔙 Back Button */
+.back-btn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: black;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Header */
+header {
+    text-align: center;
+    padding: 15px;
+}
+
+nav a {
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+/* 🔍 Search */
+.search-box {
+    width: 90%;
+    max-width: 400px;
+    margin: 15px auto;
+    display: flex;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.search-box input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+}
+.search-box span {
+    padding: 10px;
+    background: #eee;
+}
+
+/* 🔵 Upload */
+.upload-box {
+    width: 90%;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 30px;
+    background: blue;
+    color: white;
+    text-align: center;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+/* 📂 Files */
+.file {
+    width: 90%;
+    max-width: 400px;
+    margin: 10px auto;
+    padding: 15px;
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+/* Buttons */
+.btn {
+    margin: 5px;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.preview { background: green; color: white; }
+
+/* ⬇️ blinking */
+.download {
+    animation: blink 1s infinite;
+}
+@keyframes blink {
+    0% { background: blue; color: white; }
+    50% { background: red; color: white; }
+    100% { background: blue; color: white; }
+}
+
+.delete {
+    background: red;
+    color: white;
+    display: block;
+    margin: 10px auto;
+}
+
+/* Cards */
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    width: 250px;
+    margin: 10px;
+    padding: 15px;
+    background: #eee;
+    border-radius: 10px;
+    text-align: center;
+}
+</style>
+
 </head>
+
 <body>
 
-<header>
-    <h1>📚 Notes</h1>
+<!-- 🔙 Back -->
 
-    <nav>
-        <a href="index.html">🏠 Home</a>
-        <a href="ppts.html">📄 PPTs</a>
-        <a href="chat.html">💬 Chat</a>
-    </nav>
+<button class="back-btn" onclick="goBack()">←</button>
+
+<header>
+<h1>📚 Notes</h1>
+
+<nav>
+<a href="index.html">🏠 Home</a>
+<a href="ppts.html">📄 PPTs</a>
+<a href="chat.html">💬 Chat</a>
+</nav>
 </header>
 
+<!-- 🔍 Search -->
+
+<div class="search-box">
+<input type="text" id="search" placeholder="🔍 Search Notes...">
+<span>🔍</span>
+</div>
+
+<!-- 🔵 Upload -->
+
+<div class="upload-box" onclick="fileInput.click()">
+<h2>⬇️ Upload Notes</h2>
+</div>
+
+<input type="file" id="fileInput" hidden>
+
+<!-- 📂 Uploaded Files -->
+
+<div id="fileList"></div>
+
+<!-- Your Original Cards -->
+
 <section class="cards">
-
-    <div class="card">
-        <h3>1-1 Semester</h3>
-        <p>No Notes Uploaded Yet</p>
-        <button>Upload Notes</button>
-    </div>
-
-    <div class="card">
-        <h3>1-2 Semester</h3>
-        <p>No Notes Uploaded Yet</p>
-        <button>Upload Notes</button>
-    </div>
-
-    <div class="card">
-        <h3>2-1 Semester</h3>
-        <p>No Notes Uploaded Yet</p>
-        <button>Upload Notes</button>
-    </div>
-
+<div class="card"><h3>1-1 Semester</h3></div>
+<div class="card"><h3>1-2 Semester</h3></div>
+<div class="card"><h3>2-1 Semester</h3></div>
 </section>
 
-<footer>
+<footer style="text-align:center;margin:20px;">
 © 2026 MLRITM Student Hub
 </footer>
 
+<script>
+function goBack() {
+    if (document.referrer === "") {
+        window.location.href = "index.html";
+    } else {
+        window.history.back();
+    }
+}
+
+let files = [];
+
+const fileInput = document.getElementById("fileInput");
+const fileList = document.getElementById("fileList");
+const search = document.getElementById("search");
+
+fileInput.addEventListener("change", function () {
+    let file = this.files[0];
+    if (!file) return;
+
+    let url = URL.createObjectURL(file);
+    files.push({ name: file.name, url: url });
+
+    displayFiles();
+});
+
+function displayFiles() {
+    fileList.innerHTML = "";
+    let text = search.value.toLowerCase();
+
+    files.forEach((file, index) => {
+        if (!file.name.toLowerCase().includes(text)) return;
+
+        let div = document.createElement("div");
+        div.className = "file";
+
+        div.innerHTML = `
+        <b>${file.name}</b><br><br>
+
+        <button class="btn preview" onclick="window.open('${file.url}')">👁️ Preview</button>
+
+        <a href="${file.url}" download>
+            <button class="btn download">⬇️ Download</button>
+        </a>
+
+        <button class="btn delete" onclick="deleteFile(${index})">❌ Delete</button>
+        `;
+
+        fileList.appendChild(div);
+    });
+}
+
+function deleteFile(index) {
+    files.splice(index, 1);
+    displayFiles();
+}
+
+search.addEventListener("input", displayFiles);
+</script>
+
 </body>
-                              </html>
+    </html>
+                      
