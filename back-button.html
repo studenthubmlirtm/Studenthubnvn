@@ -1,0 +1,9 @@
+<div id="backBtn"></div>
+
+<script>
+fetch("back-button.html")
+  .then(res => res.text())
+  .then(data => {
+    document.getElementById("backBtn").innerHTML = data;
+  });
+</script>
