@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Student Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Login</h2>
+
+    <input type="email" id="username" placeholder="Enter Email">
+    <input type="password" id="password" placeholder="Enter Password">
+
+    <button onclick="login()">Login</button>
+
+    <p id="message"></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWOpNdjR2HeI9KDY97gCd5TYdsf5cTSY8",
+      authDomain: "studenthubnvn.firebaseapp.com",
+      projectId: "studenthubnvn",
+      storageBucket: "studenthubnvn.firebasestorage.app",
+      messagingSenderId: "130984907739",
+      appId: "1:130984907739:web:fd348949df1ed949a24dfe",
+      measurementId: "G-MQ2YXXVHR0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.login = function () {
+      const email = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          document.getElementById("message").innerText = "Login Successful ✅";
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          document.getElementById("message").innerText = error.message;
+        });
+    };
+  </script>
+
+</body>
+  </html>
