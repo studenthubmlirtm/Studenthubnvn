@@ -1,53 +1,181 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Upload PPT</title>
-</head>
+<title>PPT Upload System</title>
 
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+}
+
+/* 🔍 Search Bar */
+.search-box {
+  width: 90%;
+  max-width: 400px;
+  margin: 20px auto;
+  display: flex;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+}
+
+.search-box span {
+  padding: 10px;
+  background: #eee;
+}
+
+/* ⬇️ Upload Box */
+.upload-box {
+  width: 90%;
+  max-width: 400px;
+  margin: 30px auto;
+  padding: 40px;
+  background: blue;
+  color: white;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.upload-box:hover {
+  background: #0000cc;
+}
+
+/* 📂 File List */
+.file {
+  width: 90%;
+  max-width: 400px;
+  margin: 15px auto;
+  padding: 15px;
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+/* Buttons */
+.btn {
+  margin: 5px;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* 👁️ Preview */
+.preview-btn {
+  background: green;
+  color: white;
+}
+
+/* ⬇️ Download blinking */
+.download-btn {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { background: blue; color: white; }
+  50% { background: red; color: white; }
+  100% { background: blue; color: white; }
+}
+
+/* ❌ Delete */
+.delete-btn {
+  background: red;
+  color: white;
+  display: block;
+  margin: 10px auto 0;
+}
+</style>
+
+</head>
 <body>
 
-  <h2>Upload Notes / PPT</h2>
+<!-- 🔍 Search -->
+<div class="search-box">
+  <input type="text" id="search" placeholder="Search PPT...">
+  <span>🔍</span>
+</div>
 
-  <!-- ✅ Upload Button -->
-  <input type="file" id="fileInput" accept=".ppt,.pptx,.pdf">
-  <button onclick="uploadFile()">Upload</button>
+<!-- ⬇️ Upload -->
+<div class="upload-box" onclick="document.getElementById('fileInput').click()">
+  <h2>⬇️ Upload PPT</h2>
+</div>
 
-  <hr>
+<input type="file" id="fileInput" accept=".ppt,.pptx" hidden>
 
-  <!-- ✅ Uploaded Files List -->
-  <h3>Uploaded Files</h3>
-  <ul id="fileList"></ul>
+<!-- 📂 Files -->
+<div id="fileList"></div>
 
-  <!-- ✅ Script (DO NOT MOVE) -->
-  <script>
-    function uploadFile() {
-      const fileInput = document.getElementById("fileInput");
-      const file = fileInput.files[0];
+<script>
+let files = [];
 
-      if (!file) {
-        alert("Please select a file first");
-        return;
-      }
+const input = document.getElementById("fileInput");
+const fileList = document.getElementById("fileList");
+const search = document.getElementById("search");
 
-      const fileURL = URL.createObjectURL(file);
+// Upload
+input.addEventListener("change", function () {
+  let file = this.files[0];
+  if (!file) return;
 
-      const list = document.getElementById("fileList");
-      const li = document.createElement("li");
+  let url = URL.createObjectURL(file);
 
-      li.innerHTML = `
-        ${file.name}
-        <br>
-        <a href="${fileURL}" download>Download</a>
-      `;
+  files.push({
+    name: file.name,
+    url: url
+  });
 
-      list.appendChild(li);
+  displayFiles();
+});
 
-      // Clear input after upload
-      fileInput.value = "";
-    }
-  </script>
+// Display
+function displayFiles() {
+  fileList.innerHTML = "";
+
+  let searchText = search.value.toLowerCase();
+
+  files.forEach((file, index) => {
+    if (!file.name.toLowerCase().includes(searchText)) return;
+
+    let div = document.createElement("div");
+    div.className = "file";
+
+    div.innerHTML = `
+      <b>${file.name}</b><br><br>
+
+      <button class="btn preview-btn" onclick="previewFile('${file.url}')">👁️ Preview</button>
+
+      <a href="${file.url}" download>
+        <button class="btn download-btn">⬇️ Download</button>
+      </a>
+
+      <button class="btn delete-btn" onclick="deleteFile(${index})">❌ Delete</button>
+    `;
+
+    fileList.appendChild(div);
+  });
+}
+
+// Preview
+function previewFile(url) {
+  window.open(url, "_blank");
+}
+
+// Delete
+function deleteFile(index) {
+  files.splice(index, 1);
+  displayFiles();
+}
+
+// Search
+search.addEventListener("input", displayFiles);
+</script>
 
 </body>
-</html>
-
-    
+  </html>
