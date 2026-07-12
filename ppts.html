@@ -1,48 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPTs - MLRITM Student Hub</title>
-    <link rel="stylesheet" href="style.css">
+  <title>Upload PPT</title>
 </head>
+
 <body>
 
-<header>
-    <h1>📄 PPTs</h1>
+  <h2>Upload Notes / PPT</h2>
 
-    <nav>
-        <a href="index.html">🏠 Home</a>
-        <a href="notes.html">📚 Notes</a>
-        <a href="chat.html">💬 Chat</a>
-    </nav>
-</header>
+  <!-- ✅ Upload Button -->
+  <input type="file" id="fileInput" accept=".ppt,.pptx,.pdf">
+  <button onclick="uploadFile()">Upload</button>
 
-<section class="cards">
+  <hr>
 
-    <div class="card">
-        <h3>Java PPT</h3>
-        <p>No PPT Uploaded Yet</p>
-        <button>Upload PPT</button>
-    </div>
+  <!-- ✅ Uploaded Files List -->
+  <h3>Uploaded Files</h3>
+  <ul id="fileList"></ul>
 
-    <div class="card">
-        <h3>Python PPT</h3>
-        <p>No PPT Uploaded Yet</p>
-        <button>Upload PPT</button>
-    </div>
+  <!-- ✅ Script (DO NOT MOVE) -->
+  <script>
+    function uploadFile() {
+      const fileInput = document.getElementById("fileInput");
+      const file = fileInput.files[0];
 
-    <div class="card">
-        <h3>C Programming PPT</h3>
-        <p>No PPT Uploaded Yet</p>
-        <button>Upload PPT</button>
-    </div>
+      if (!file) {
+        alert("Please select a file first");
+        return;
+      }
 
-</section>
+      const fileURL = URL.createObjectURL(file);
 
-<footer>
-© 2026 MLRITM Student Hub
-</footer>
+      const list = document.getElementById("fileList");
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        ${file.name}
+        <br>
+        <a href="${fileURL}" download>Download</a>
+      `;
+
+      list.appendChild(li);
+
+      // Clear input after upload
+      fileInput.value = "";
+    }
+  </script>
 
 </body>
-      </html>
+</html>
+
+    
