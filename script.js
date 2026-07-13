@@ -1,6 +1,5 @@
 const supabaseUrl = "https://jnojdhyulyxzzgozhxmo.supabase.co";
-const supabaseKey = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
-
+const supabaseKey = "sb_publishable_8y6s7Jxb8crDpqzk3KN8rQ_KUZjpJ8Z";
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 const uploadBtn = document.getElementById("uploadBtn");
