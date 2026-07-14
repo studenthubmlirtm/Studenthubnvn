@@ -1,97 +1,72 @@
-const supabaseUrl = "https://jnojdhyulyxzzgozhxmo.supabase.co";
-const supabaseKey = "sb_publishable_8y6s7Jxb8crDpqzk3KN8rQ_KUZjpJ8Z";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-const uploadBtn = document.getElementById("uploadBtn");
-const fileInput = document.getElementById("fileInput");
-const studentName = document.getElementById("studentName");
-const fileList = document.getElementById("fileList");
-const search = document.getElementById("search");
-
-async function loadFiles() {
-
-    let { data, error } = await supabase
-        .from("notes")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        fileList.innerHTML = "Unable to load files.";
-        return;
-    }
-
-    showFiles(data);
-}
-
-function showFiles(files) {
-
-    const keyword = search.value.toLowerCase();
-
-    fileList.innerHTML = "";
-
-    files.forEach(file => {
-
-        if (!file.file_name.toLowerCase().includes(keyword))
-            return;
-
-        fileList.innerHTML += `
-        <div class="file">
-            <b>${file.file_name}</b><br>
-            Uploaded by: ${file.uploaded_by || "Anonymous"}<br><br>
-
-            <a href="${file.file_url}" target="_blank">
-                <button class="btn preview">Preview</button>
-            </a>
-
-            <a href="${file.file_url}" download>
-                <button class="btn download">Download</button>
-            </a>
-        </div>
-        `;
-    });
-}
-
-search.addEventListener("input", loadFiles);
-
 uploadBtn.addEventListener("click", async () => {
 
     const file = fileInput.files[0];
 
     if (!file) {
-        alert("Choose a file.");
+        alert("Please choose a file.");
         return;
     }
+
+    // Allow only PDF, PPT, PPTX
+    const allowed = [".pdf", ".ppt", ".pptx"];
+    const ext = file.name.substring(file.name.lastIndexOf(".")).toLowerCase();
+
+    if (!allowed.includes(ext)) {
+        alert("Only PDF, PPT and PPTX files are allowed.");
+        return;
+    }
+
+    // Maximum 20 MB
+    if (file.size > 20 * 1024 * 1024) {
+        alert("File size must be less than 20 MB.");
+        return;
+    }
+
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = "Uploading...";
 
     const path = Date.now() + "_" + file.name;
 
-    const { error: uploadError } =
-        await supabase.storage
-            .from("notes")
-            .upload(path, file);
+    // Upload file to Storage
+    const { error: uploadError } = await supabase.storage
+        .from("notes")
+        .upload(path, file);
 
     if (uploadError) {
         alert(uploadError.message);
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = "Upload";
         return;
     }
 
-    const { data } =
-        supabase.storage
-            .from("notes")
-            .getPublicUrl(path);
+    // Get public URL
+    const { data } = supabase.storage
+        .from("notes")
+        .getPublicUrl(path);
 
-    await supabase
+    // Save file info in database
+    const { error: insertError } = await supabase
         .from("notes")
         .insert({
             file_name: file.name,
             file_url: data.publicUrl,
-            uploaded_by: studentName.value
+            uploaded_by: studentName.value.trim() || "Anonymous"
         });
 
-    alert("Upload successful.");
+    if (insertError) {
+        alert(insertError.message);
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = "Upload";
+        return;
+    }
+
+    alert("Upload successful!");
 
     fileInput.value = "";
+    studentName.value = "";
+
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = "Upload";
 
     loadFiles();
 });
-
-loadFiles();
